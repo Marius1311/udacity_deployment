@@ -17,6 +17,7 @@ def model_fn(model_dir):
 
     # First, load the parameters used to create the model.
     model_info = {}
+    # we import a file where the hyperparameters of this model are specified, like the embedding dimension
     model_info_path = os.path.join(model_dir, 'model_info.pth')
     with open(model_info_path, 'rb') as f:
         model_info = torch.load(f)
@@ -68,8 +69,29 @@ def train(model, train_loader, epochs, optimizer, loss_fn, device):
     """
     
     # TODO: Paste the train() method developed in the notebook here.
-
-    pass
+    for epoch in range(1, epochs + 1):
+        model.train()
+        total_loss = 0
+        for batch in train_loader:         
+            batch_X, batch_y = batch
+            
+            batch_X = batch_X.to(device)
+            batch_y = batch_y.to(device)
+            
+            # TODO: Complete this train method to train the model provided.
+            # perform forward pas
+            scores = model.forward(batch_X)
+            loss = loss_fn(scores, batch_y)
+            
+            # zero out accumulated gradients
+            optimizer.zero_grad()
+            
+            # could additionally clip the grad norm here
+            loss.backward()
+            optimizer.step()
+            
+            total_loss += loss.data.item()
+        print("Epoch: {}, BCELoss: {}".format(epoch, total_loss / len(train_loader)))
 
 
 if __name__ == '__main__':
